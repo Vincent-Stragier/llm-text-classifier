@@ -1,0 +1,11 @@
+---
+model:
+  hub: TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF
+  file: https://huggingface.co/TheBloke/Mixtral-8x7B-Instruct-v0.1-GGUF/resolve/main/mixtral-8x7b-instruct-v0.1.Q5_K_M.gguf
+  local_path: ../models/mixtral-8x7b-instruct-v0.1.Q5_K_M.gguf
+  friendly_name: mixtral_instruct_8_7b
+  description: Mixtral 8x7B Instruct model
+
+prompt:
+  system_template: >
+  <s>[INST] {{system_prompt}} {{prompt}} [/INST]
