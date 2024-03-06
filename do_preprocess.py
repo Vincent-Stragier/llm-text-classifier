@@ -2,10 +2,13 @@
 Do classifications with Mixtral Instruct, Mistral Instruct, and all the Llama 2 chat models.
 """
 import json
+import os
+
 from copy import deepcopy
 from typing import Iterable
 
 import numpy as np
+import jinja2
 
 
 def load_dataset(path) -> list:
@@ -70,9 +73,11 @@ def generate_prompts(tools: str):
 # models, prompts, datasets
 # Features, classification performances, speed (min, max, median, average)
 # extract probabilities, etc.
+# https://llama-cpp-python.readthedocs.io/en/latest/api-reference/#llama_cpp.llama_cpp.llama_sample_apply_guidance
 
 
 # Models
+# Don't do that, use a models_configs/model_name_config_name.yaml file
 models = (
     # "https://huggingface.co/TheBloke/Llama-2-7b-Chat-GGUF/blob/main/llama-2-7b-chat.Q5_K_M.gguf",
 
@@ -81,6 +86,45 @@ models = (
 # Do classifications
 # Save the results
 # Plot the results
+
+
+def load_template(
+    template_path: os.PathLike,
+) -> dict:
+    """Load all the templates from a specified directory.
+
+    Args:
+        template_path (os.PathLike): the path to the templates directory.
+
+    Returns:
+        dict: a dictionary with all the templates.
+        The key of the template is its filename.
+    """
+    # load all files as template, file name is the key of the template
+    template_files = os.listdir(template_path)
+
+    template_dict = {}
+
+    for template in template_files:
+        template_file_path = os.path.join(template_path, template)
+        if not os.path.isfile(template_file_path):
+            continue
+
+        # We have a file
+        with open(template_file_path, mode='r', encoding='utf-8') as template_file:
+            template_dict[template] = jinja2.Template(template_file.read())
+
+    return template_dict
+
+
+def render_template(
+    template: Iterable,
+    content: dict,
+):
+    rendered_template = template.render(
+        name='Jane Doe',
+        kwargs={'name': "John Doe"},
+    )
 
 
 def main():
@@ -94,6 +138,11 @@ def main():
     print(split_b)
 
     # Build prompts
+    # Load templates
+    templates = load_template("system_prompt_templates")
+    print(templates)
+    # Render templates
+    # Tricky bit, we need template for each system prompt, for each models, for each datasets
 
 
 if __name__ == '__main__':
