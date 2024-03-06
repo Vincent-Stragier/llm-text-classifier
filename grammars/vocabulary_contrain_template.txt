@@ -1,0 +1,4 @@
+root ::= answer
+answer ::= (classes | unknown)
+classes ::= ({{ classes }})
+unknown ::= ("Unknown" | "unknown" | "UNKNOWN" | "Unk" | "unk" | "UNK" | "Un" | "un" | "UN" | "U" | "u" | "X" | "x" | "N/A" | "n/a" | "N/a")
