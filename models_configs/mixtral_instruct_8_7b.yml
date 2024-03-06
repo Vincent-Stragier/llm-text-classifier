@@ -7,5 +7,4 @@ model:
   description: Mixtral 8x7B Instruct model
 
 prompt:
-  system_template: >
-  <s>[INST] {{system_prompt}} {{prompt}} [/INST]
+  system_template: "<s>[INST] {{system_prompt}} {{prompt}} [/INST]"

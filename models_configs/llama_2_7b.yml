@@ -7,5 +7,4 @@ model:
   description: Llama 2.7B Chat model
 
 prompt:
-  system_template: >
-  [INST] <<SYS>> {{system_prompt}} <</SYS>> {{prompt}} [/INST]
+  system_template: "[INST] <<SYS>> {{system_prompt}} <</SYS>> {{prompt}} [/INST]"
