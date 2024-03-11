@@ -5,10 +5,12 @@ import json
 import os
 
 from copy import deepcopy
-from typing import Iterable
+from typing import Iterable, List
 
 import numpy as np
 import jinja2
+
+from utils import load_all_configs
 
 
 def load_dataset(path) -> list:
@@ -66,8 +68,8 @@ def split_dataset(dataset: Iterable, split: Iterable = (0.33, 0.33, 0.33), rando
     return splitted_dataset
 
 
-def generate_prompts(tools: str):
-    pass
+# def generate_prompts(tools: str):
+#     pass
 
 # DoE
 # models, prompts, datasets
@@ -118,29 +120,87 @@ def load_template(
 
 
 def render_template(
-    template: Iterable,
+    template: jinja2.Template,
     content: dict,
 ):
-    rendered_template = template.render(
-        name='Jane Doe',
-        kwargs={'name': "John Doe"},
+    """Render a template with a given content.
+
+    Args:
+        template (jinja2.Template): the template to render
+        content (dict): the content to render the template with
+
+    Returns:
+        str: the rendered template
+    """
+    return template.render(
+        **content
     )
 
 
+def make_prompts(template, model, datasets, random_seed: int = 5876) -> List[str]:
+    for dataset_name, dataset in datasets.items():
+        tools = sorted(list({tool.get('tool_name', None) for tool in dataset}))
+
+        for tool in dataset:
+            test_set = tool.get('dataset', {}).get('test', None)
+            train_set = deepcopy(tool.get('dataset', {}).get('train', None))
+
+            if test_set is None:
+                raise ValueError(
+                    f"Test set is missing for tool {tool['tool_name']}")
+
+            if train_set is None:
+                raise ValueError(
+                    f"Train set is missing for tool {tool['tool_name']}")
+
+            # randomly select an element from the train set using a specific seed
+            np.random.seed(random_seed)
+            selected_element = np.random.choice(train_set)
+
+            for element in test_set:
+                # user_request
+                print(element.get('user_request', None),
+                      element.get('command', None))
+
+        """Make a prompt."""
+        # I want to build example from the dataset via train set
+        # And use every element of the dev set
+        # list all the class, list all the
+
+    return []
+
+
 def main():
+    """The main function of the script."""
+    # Dataset generated via Belunga using a zero-shot approach
     dataset_a = load_dataset("datasets/dataset_a.json")
+    # Dataset generated via Belunga using a one-shot approach
     dataset_b = load_dataset("datasets/dataset_b.json")
 
-    split_a = split_dataset(dataset_a)
-    split_b = split_dataset(dataset_b)
-
-    print(split_a)
-    print(split_b)
+    datasets = {
+        "dataset_zero_shot": split_dataset(dataset_a),
+        "dataset_one_shot": split_dataset(dataset_b),
+    }
 
     # Build prompts
     # Load templates
-    templates = load_template("system_prompt_templates")
-    print(templates)
+    templates = load_template("./system_prompt_templates")
+    models_configs = load_all_configs("./models_configs")
+
+    prompts = make_prompts(templates, models_configs, datasets)
+
+    exit()
+    for config_file, model_config in models_configs.items():
+        # Extract model info
+        model_info = model_config.get('model', {})
+        friendly_name = model_info.get('friendly_name', config_file)
+        prompt_config = model_config.get('prompt', {})
+        system_prompt_template = prompt_config.get(
+            'system_template', 'default')
+        system_prompt_template = jinja2.Template(system_prompt_template)
+
+        test = render_template(system_prompt_template, {})
+
     # Render templates
     # Tricky bit, we need template for each system prompt, for each models, for each datasets
 

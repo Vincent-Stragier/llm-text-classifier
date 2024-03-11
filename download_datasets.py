@@ -2,6 +2,8 @@
 import os
 import requests
 
+from utils import ensure_path_exists
+
 URL_A = "https://raw.githubusercontent.com/Vincent-Stragier/prompt_based_dataset_generation/ac84a1a640a209bd2d1047ce1bf9cae62374e3d5/datasets/results_prompts_0.json"
 URL_B = "https://raw.githubusercontent.com/Vincent-Stragier/prompt_based_dataset_generation/ac84a1a640a209bd2d1047ce1bf9cae62374e3d5/datasets/results_prompts_1.json"
 
@@ -15,12 +17,6 @@ def download_file(url, filename):
 
     with open(filename, 'wb') as file:
         file.write(response.content)
-
-
-def ensure_path_exists(path: os.PathLike):
-    """Ensure the path exists"""
-    if not os.path.exists(path):
-        os.makedirs(path, exist_ok=True)
 
 
 if __name__ == "__main__":
