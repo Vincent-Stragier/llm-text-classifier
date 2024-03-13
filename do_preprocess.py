@@ -3,6 +3,7 @@ Do classifications with Mixtral Instruct, Mistral Instruct, and all the Llama 2 
 """
 import json
 import os
+import pathlib
 
 from copy import deepcopy
 from typing import Iterable, List
@@ -137,37 +138,99 @@ def render_template(
     )
 
 
-def make_prompts(template, model, datasets, random_seed: int = 5876) -> List[str]:
-    for dataset_name, dataset in datasets.items():
-        tools = sorted(list({tool.get('tool_name', None) for tool in dataset}))
+def generate_example_text(example: dict) -> str:
+    """Generate the example from test set.
 
-        for tool in dataset:
-            test_set = tool.get('dataset', {}).get('test', None)
-            train_set = deepcopy(tool.get('dataset', {}).get('train', None))
+    Args:
+        example (dict): the element extracted from the test set
 
-            if test_set is None:
-                raise ValueError(
-                    f"Test set is missing for tool {tool['tool_name']}")
+    Returns:
+        str: a formatted string
+    """
+    return f"```\n{example.get('user_request', None)}[/INST]\n{example.get('command', None)}\n```"
 
-            if train_set is None:
-                raise ValueError(
-                    f"Train set is missing for tool {tool['tool_name']}")
 
-            # randomly select an element from the train set using a specific seed
-            np.random.seed(random_seed)
-            selected_element = np.random.choice(train_set)
+def make_prompts(prompts_templates, models_dict, datasets, root='./prompts', random_seed: int = 5876):
+    # Models
 
-            for element in test_set:
-                # user_request
-                print(element.get('user_request', None),
-                      element.get('command', None))
+    expected_class = {}
 
-        """Make a prompt."""
-        # I want to build example from the dataset via train set
-        # And use every element of the dev set
-        # list all the class, list all the
+    for config_file, model_config in models_dict.items():
+        # Extract model info
+        model_info = model_config.get('model', {})
+        friendly_name = model_info.get('friendly_name', config_file)
+        prompt_config = model_config.get('prompt', {})
+        system_prompt_template = prompt_config.get(
+            'system_template', 'default')
+        model_template = jinja2.Template(system_prompt_template)
 
-    return []
+        for dataset_name, dataset in datasets.items():
+            # All the tools in the dataset
+            tools = sorted(list({tool.get('tool_name', None)
+                           for tool in dataset}))
+
+            classes_list = "\n-"
+            classes_list = f"-{classes_list.join(tools)}"
+
+            for tool, tool_name in zip(dataset, tools):
+                test_set = tool.get('dataset', {}).get('test', None)
+                train_set = deepcopy(
+                    tool.get('dataset', {}).get('train', None))
+
+                if test_set is None:
+                    raise ValueError(
+                        f"Test set is missing for tool {tool['tool_name']}")
+
+                if train_set is None:
+                    raise ValueError(
+                        f"Train set is missing for tool {tool['tool_name']}")
+
+                # randomly select an element from the train set using a specific seed
+                np.random.seed(random_seed)
+                selected_element = np.random.choice(train_set)
+
+                # print(model)
+                examples_from_train_list = generate_example_text(
+                    selected_element)
+
+                element = test_set[0]
+
+                for template_name, prompt_template in prompts_templates.items():
+                    # Create the directory for the tools prompts
+                    save_path = pathlib.Path(
+                        f"{root}/{friendly_name}/{dataset_name}/{template_name}/{tool_name}")
+                    save_path.mkdir(parents=True, exist_ok=True)
+
+                    system_prompt = render_template(
+                        prompt_template,
+                        {
+                            "classes_list": classes_list,
+                            "examples_from_train_list": examples_from_train_list,
+                        }
+                    )
+
+                    for index, element in enumerate(test_set):
+                        element_prompt = render_template(
+                            model_template,
+                            {
+                                "system_prompt": system_prompt,
+                                "prompt": element.get('user_request', None)
+                            }
+                        )
+
+                        # Save element_prompt
+                        element_prompt_path = save_path / f"prompt_{index}.txt"
+                        expected_class[str(element_prompt_path)] = element.get(
+                            'command', None)
+                        with element_prompt_path.open(mode='w', encoding='utf-8') as prompt_file:
+                            prompt_file.write(element_prompt)
+
+                        # We can save the expected class here
+
+        root = pathlib.Path(root)
+        ground_truth = root / 'ground_truth.json'
+        with ground_truth.open(mode='w', encoding='utf-8') as ground_truth_file:
+            ground_truth_file.write(json.dumps(expected_class, indent=4))
 
 
 def main():
@@ -187,22 +250,7 @@ def main():
     templates = load_template("./system_prompt_templates")
     models_configs = load_all_configs("./models_configs")
 
-    prompts = make_prompts(templates, models_configs, datasets)
-
-    exit()
-    for config_file, model_config in models_configs.items():
-        # Extract model info
-        model_info = model_config.get('model', {})
-        friendly_name = model_info.get('friendly_name', config_file)
-        prompt_config = model_config.get('prompt', {})
-        system_prompt_template = prompt_config.get(
-            'system_template', 'default')
-        system_prompt_template = jinja2.Template(system_prompt_template)
-
-        test = render_template(system_prompt_template, {})
-
-    # Render templates
-    # Tricky bit, we need template for each system prompt, for each models, for each datasets
+    make_prompts(templates, models_configs, datasets)
 
 
 if __name__ == '__main__':
