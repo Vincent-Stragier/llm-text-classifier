@@ -6,7 +6,7 @@ import os
 import pathlib
 
 from copy import deepcopy
-from typing import Iterable, List
+from typing import Iterable
 
 import numpy as np
 import jinja2
@@ -62,7 +62,7 @@ def split_dataset(dataset: Iterable, split: Iterable = (0.33, 0.33, 0.33), rando
 
         # Split the dataset
         assert len(adapted_split) >= 3
-        train, test, validation = np.split(subdataset, adapted_split)[:3]
+        train, test, validation = np.split(subdataset, adapted_split)[:3]  # noqa
         splitted_dataset[index]['dataset'] = {
             'train': train, 'test': test, 'validation': validation}
 
