@@ -1,6 +1,8 @@
 """
-Do classifications with Mixtral Instruct, Mistral Instruct, and all the Llama 2 chat models.
+Do classifications with Mixtral Instruct, Mistral Instruct,
+and all the Llama 2 chat models.
 """
+
 import json
 import os
 import pathlib
@@ -23,11 +25,15 @@ def load_dataset(path) -> list:
     Returns:
         list: the list of the dataset elements
     """
-    with open(path, mode='rb') as json_file:
+    with open(path, mode="rb") as json_file:
         return json.load(json_file)
 
 
-def split_dataset(dataset: Iterable, split: Iterable = (0.33, 0.33, 0.33), random_state: int = 53):
+def split_dataset(
+    dataset: Iterable,
+    split: Iterable = (0.33, 0.33, 0.33),
+    random_state: int = 53,
+):
     """Split a dataset into three parts.
 
     Args:
@@ -52,19 +58,25 @@ def split_dataset(dataset: Iterable, split: Iterable = (0.33, 0.33, 0.33), rando
     splitted_dataset = deepcopy(dataset)
     for index, tool in enumerate(dataset):
         # Compute the split
-        subdataset_length = len(tool['dataset'])
+        subdataset_length = len(tool["dataset"])
         adapted_split = np.array(
-            normalized_split * subdataset_length, dtype=int).cumsum()
+            normalized_split * subdataset_length, dtype=int
+        ).cumsum()
 
         # Shuffle the dataset
-        subdataset = deepcopy(tool['dataset'])
+        subdataset = deepcopy(tool["dataset"])
         np.random.shuffle(subdataset)
 
         # Split the dataset
         assert len(adapted_split) >= 3
-        train, test, validation = np.split(subdataset, adapted_split)[:3]  # noqa
-        splitted_dataset[index]['dataset'] = {
-            'train': train, 'test': test, 'validation': validation}
+        train, test, validation = np.split(subdataset, adapted_split)[
+            :3
+        ]  # noqa
+        splitted_dataset[index]["dataset"] = {
+            "train": train,
+            "test": test,
+            "validation": validation,
+        }
 
     return splitted_dataset
 
@@ -83,7 +95,6 @@ def split_dataset(dataset: Iterable, split: Iterable = (0.33, 0.33, 0.33), rando
 # Don't do that, use a models_configs/model_name_config_name.yaml file
 models = (
     # "https://huggingface.co/TheBloke/Llama-2-7b-Chat-GGUF/blob/main/llama-2-7b-chat.Q5_K_M.gguf",
-
 )
 # Do dataset splits (evaluation, training, and testing)
 # Do classifications
@@ -114,7 +125,9 @@ def load_template(
             continue
 
         # We have a file
-        with open(template_file_path, mode='r', encoding='utf-8') as template_file:
+        with open(
+            template_file_path, mode="r", encoding="utf-8"
+        ) as template_file:
             template_dict[template] = jinja2.Template(template_file.read())
 
     return template_dict
@@ -133,9 +146,7 @@ def render_template(
     Returns:
         str: the rendered template
     """
-    return template.render(
-        **content
-    )
+    return template.render(**content)
 
 
 def generate_example_text(example: dict) -> str:
@@ -147,66 +158,89 @@ def generate_example_text(example: dict) -> str:
     Returns:
         str: a formatted string
     """
-    return f"```\n{example.get('user_request', None)}[/INST]\n{example.get('command', None)}\n```"
+    return (
+        f"```\n{example.get('user_request', None)}[/INST]\n"
+        f"{example.get('command', None)}\n```"
+    )
 
 
-def make_prompts(prompts_templates, models_dict, datasets, root='./prompts', random_seed: int = 5876):
+def make_prompts(
+    prompts_templates,
+    models_dict,
+    datasets,
+    root="./prompts",
+    random_seed: int = 5876,
+):
     # Models
 
     expected_class = {}
 
     for config_file, model_config in models_dict.items():
         # Extract model info
-        model_info = model_config.get('model', {})
-        friendly_name = model_info.get('friendly_name', config_file)
-        prompt_config = model_config.get('prompt', {})
+        model_info = model_config.get("model", {})
+        friendly_name = model_info.get("friendly_name", config_file)
+        prompt_config = model_config.get("prompt", {})
         system_prompt_template = prompt_config.get(
-            'system_template', 'default')
+            "system_template", "default"
+        )
         model_template = jinja2.Template(system_prompt_template)
 
         for dataset_name, dataset in datasets.items():
             # All the tools in the dataset
-            tools = sorted(list({tool.get('tool_name', None)
-                           for tool in dataset}))
+            tools = sorted(
+                list({tool.get("tool_name", None) for tool in dataset})
+            )
 
             classes_list = "\n-"
             classes_list = f"-{classes_list.join(tools)}"
 
             for tool, tool_name in zip(dataset, tools):
-                test_set = tool.get('dataset', {}).get('test', None)
+                test_set = tool.get("dataset", {}).get("test", None)
                 train_set = deepcopy(
-                    tool.get('dataset', {}).get('train', None))
+                    tool.get("dataset", {}).get("train", None)
+                )
 
                 if test_set is None:
                     raise ValueError(
-                        f"Test set is missing for tool {tool['tool_name']}")
+                        f"Test set is missing for tool {tool['tool_name']}"
+                    )
 
                 if train_set is None:
                     raise ValueError(
-                        f"Train set is missing for tool {tool['tool_name']}")
+                        f"Train set is missing for tool {tool['tool_name']}"
+                    )
 
-                # randomly select an element from the train set using a specific seed
+                # randomly select an element from the train set
+                # using a specific seed
                 np.random.seed(random_seed)
                 selected_element = np.random.choice(train_set)
 
                 # print(model)
                 examples_from_train_list = generate_example_text(
-                    selected_element)
+                    selected_element
+                )
 
                 element = test_set[0]
 
-                for template_name, prompt_template in prompts_templates.items():
+                for (
+                    template_name,
+                    prompt_template,
+                ) in prompts_templates.items():
                     # Create the directory for the tools prompts
                     save_path = pathlib.Path(
-                        f"{root}/{friendly_name}/{dataset_name}/{template_name}/{tool_name}")
+                        f"{root}/{friendly_name}/{dataset_name}/"
+                        f"{template_name}/{tool_name}"
+                    )
                     save_path.mkdir(parents=True, exist_ok=True)
+
+                    template_params = {
+                        "classes_list": classes_list,
+                        "examples_from_train_list": examples_from_train_list,
+                    }
 
                     system_prompt = render_template(
                         prompt_template,
-                        {
-                            "classes_list": classes_list,
-                            "examples_from_train_list": examples_from_train_list,
-                        }
+                        template_params,
                     )
 
                     for index, element in enumerate(test_set):
@@ -214,22 +248,27 @@ def make_prompts(prompts_templates, models_dict, datasets, root='./prompts', ran
                             model_template,
                             {
                                 "system_prompt": system_prompt,
-                                "prompt": element.get('user_request', None)
-                            }
+                                "prompt": element.get("user_request", None),
+                            },
                         )
 
                         # Save element_prompt
                         element_prompt_path = save_path / f"prompt_{index}.txt"
                         expected_class[str(element_prompt_path)] = element.get(
-                            'command', None)
-                        with element_prompt_path.open(mode='w', encoding='utf-8') as prompt_file:
+                            "command", None
+                        )
+                        with element_prompt_path.open(
+                            mode="w", encoding="utf-8"
+                        ) as prompt_file:
                             prompt_file.write(element_prompt)
 
                         # We can save the expected class here
 
         root = pathlib.Path(root)
-        ground_truth = root / 'ground_truth.json'
-        with ground_truth.open(mode='w', encoding='utf-8') as ground_truth_file:
+        ground_truth = root / "ground_truth.json"
+        with ground_truth.open(
+            mode="w", encoding="utf-8"
+        ) as ground_truth_file:
             ground_truth_file.write(json.dumps(expected_class, indent=4))
 
 
@@ -253,5 +292,5 @@ def main():
     make_prompts(templates, models_configs, datasets)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,4 +1,5 @@
 """The utility functions of the project."""
+
 import os
 import pathlib
 
@@ -55,7 +56,7 @@ def compute_cumulative_probabilities(classes_tokens_and_logits: dict):
     classes_logits = {}
 
     for class_name, tokens in classes_tokens_and_logits.items():
-        _logits = [token_info['logit'] for token_info in tokens]
+        _logits = [token_info["logit"] for token_info in tokens]
         classes_logits[class_name] = sum(_logits)
 
     _logits = numpy.array(list(classes_logits.values()))
@@ -85,7 +86,7 @@ def compute_cumulative_probabilities(classes_tokens_and_logits: dict):
 def make_result_path(
     prompt_path: pathlib.Path | str,
     prompt_root: pathlib.Path | str = DEFAULT_PROMPTS_PATH,
-    result_root: pathlib.Path | str = DEFAULT_RESULTS_PATH
+    result_root: pathlib.Path | str = DEFAULT_RESULTS_PATH,
 ) -> pathlib.Path:
     """Create the result path from the prompt path.
 
@@ -103,7 +104,7 @@ def make_result_path(
     prompt_root = pathlib.Path(prompt_root)
     result_root = pathlib.Path(result_root)
 
-    result_path = prompt_path.relative_to(prompt_root).with_suffix('.json')
+    result_path = prompt_path.relative_to(prompt_root).with_suffix(".json")
     result_path = result_root / result_path
 
     return result_path
@@ -121,26 +122,32 @@ def load_all_configs(
     """Load all the models configs from a specified directory.
 
     Args:
-        models_configs_path (os.PathLike): the path to the models configs directory.
+        models_configs_path (os.PathLike): the path to
+        the models configs directory.
 
     Returns:
         dict: a dictionary with all the models configs.
         The key of the models config is its filename.
     """
-    # load all files as models config, file name is the key of the models config
+    # load all files as models config,
+    # file name is the key of the models config
     models_configs_files = os.listdir(models_configs_path)
 
     models_configs_dict = {}
 
     for models_config in models_configs_files:
         models_config_file_path = os.path.join(
-            models_configs_path, models_config)
+            models_configs_path, models_config
+        )
         if not os.path.isfile(models_config_file_path):
             continue
 
         # We have a file
-        with open(models_config_file_path, mode='r', encoding='utf-8') as models_config_file:
+        with open(
+            models_config_file_path, mode="r", encoding="utf-8"
+        ) as models_config_file:
             models_configs_dict[models_config] = yaml.safe_load(
-                models_config_file)
+                models_config_file
+            )
 
     return models_configs_dict

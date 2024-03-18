@@ -25,7 +25,7 @@ class Classifier:
         n_threads: int = os.cpu_count(),
         n_threads_batch: int = 1,
         n_gpu_layers: int = -1,
-        numa=False
+        numa=False,
     ):
         """Initialize the classifier.
 
@@ -56,7 +56,8 @@ class Classifier:
         params.n_gpu_layers = n_gpu_layers
 
         self.model = llama_cpp.llama_load_model_from_file(
-            model_path.encode("utf-8"), params)
+            model_path.encode("utf-8"), params
+        )
 
         self.n_new_tokens = n_new_tokens
 
@@ -74,23 +75,32 @@ class Classifier:
 
     def _tokenize_initial_prompt(self, prompt: bytes, n_new_tokens: int = 32):
         self.tokens_len = llama_cpp.llama_tokenize(
-            self.model, prompt, len(prompt), self.tokens, len(self.tokens), True, True)
+            self.model,
+            prompt,
+            len(prompt),
+            self.tokens,
+            len(self.tokens),
+            True,
+            True,
+        )
 
         # Pre-allocate the KV cache
         if self.n_kv_req == -1:
             if self.n_new_tokens != n_new_tokens:
                 self.n_new_tokens = n_new_tokens
 
-            self.n_kv_req = self.tokens_len + \
-                (self.n_new_tokens - self.tokens_len) * self.n_parallel
+            self.n_kv_req = (
+                self.tokens_len
+                + (self.n_new_tokens - self.tokens_len) * self.n_parallel
+            )
 
-        return self.tokens[:self.tokens_len]
+        return self.tokens[: self.tokens_len]
 
     def _init_context(
         self,
         random_seed: int = 3254,
         n_threads: int = os.cpu_count(),
-        n_threads_batch: int = 1
+        n_threads_batch: int = 1,
     ):
         ctx_params = llama_cpp.llama_context_default_params()
         ctx_params.seed = random_seed
@@ -100,7 +110,8 @@ class Classifier:
         ctx_params.n_threads_batch = n_threads_batch
 
         self.ctx = llama_cpp.llama_new_context_with_model(
-            self.model, ctx_params)
+            self.model, ctx_params
+        )
 
         self.n_ctx = llama_cpp.llama_n_ctx(self.ctx)
 
@@ -112,7 +123,8 @@ class Classifier:
             )
 
         self.batch = llama_cpp.llama_batch_init(
-            max(self.tokens_len, self.n_parallel), 0, 1)
+            max(self.tokens_len, self.n_parallel), 0, 1
+        )
 
         self.batch.n_tokens = self.tokens_len
         for index in range(self.tokens_len):
@@ -125,20 +137,16 @@ class Classifier:
         self.batch.logits[self.batch.n_tokens - 1] = True
 
         if llama_cpp.llama_decode(self.ctx, self.batch) != 0:
-            raise ValueError(
-                "Failed to initialize the batch. Error decoding."
-            )
+            raise ValueError("Failed to initialize the batch. Error decoding.")
 
         # Initialize the KV cache
         for index in range(self.n_parallel):
             llama_cpp.llama_kv_cache_seq_cp(
-                self.ctx, 0, index, 0, self.batch.n_tokens)
+                self.ctx, 0, index, 0, self.batch.n_tokens
+            )
 
     def _tokenize_string(
-        self,
-        string: bytes | str,
-        add_bos: bool = False,
-        special: bool = True
+        self, string: bytes | str, add_bos: bool = False, special: bool = True
     ) -> list[int]:
         # Adapte context size to the string length
         # A safe value is the string length + 1
@@ -189,7 +197,8 @@ class Classifier:
     def _decode_token(self, token_id: int) -> str:
         buffer = (ctypes.c_char * 32)()
         out_len = llama_cpp.llama_token_to_piece(
-            self.model, token_id, buffer, len(buffer))
+            self.model, token_id, buffer, len(buffer)
+        )
 
         return bytes(buffer[:out_len]).decode("utf-8")
 
@@ -205,8 +214,7 @@ class Classifier:
         add_most_likely_token: bool = False,
     ):
         classes_tokens_and_logit = {
-            class_name: []
-            for class_name in self.classes
+            class_name: [] for class_name in self.classes
         }
 
         most_likely_tokens_index = self.n_parallel - 1
@@ -234,8 +242,8 @@ class Classifier:
                 token_id_index = n_cur - n_cur_initial
 
                 if (
-                    token_id_index >= len(tokenized_classes[index]) or
-                    i_batch[index] == -1
+                    token_id_index >= len(tokenized_classes[index])
+                    or i_batch[index] == -1
                 ):
                     i_batch[index] = -1
                     continue
@@ -244,7 +252,8 @@ class Classifier:
 
                 # print(f'Before logits {i_batch=}, {i_batch[index]=}')
                 logits = llama_cpp.llama_get_logits_ith(
-                    self.ctx, i_batch[index])
+                    self.ctx, i_batch[index]
+                )
 
                 self._append_to_dict(
                     classes_tokens_and_logit,
@@ -253,12 +262,12 @@ class Classifier:
                         "logit": logits[current_class_token],  # noqa
                         "token": current_class_token,
                         "token_str": self._decode_token(current_class_token),
-                    }
+                    },
                 )
 
                 if (
-                    current_class_token == llama_cpp.llama_token_eos(self.ctx) or
-                    n_cur >= self.n_new_tokens
+                    current_class_token == llama_cpp.llama_token_eos(self.ctx)
+                    or n_cur >= self.n_new_tokens
                 ):
                     i_batch[index] = -1
                     continue
@@ -267,15 +276,15 @@ class Classifier:
                 i_batch[index] = self.batch.n_tokens
                 n_decode += 1
 
-            # Generate most likely token for unknown class if we have not reached the end
+            # Generate most likely token for unknown class
+            # if we have not reached the end
             if (
-                i_batch[most_likely_tokens_index] != -1 and
-                add_most_likely_token
+                i_batch[most_likely_tokens_index] != -1
+                and add_most_likely_token
             ):
-                # This call stops the program without error or warning for no reason
-                # How to debug this?
                 logits = llama_cpp.llama_get_logits_ith(
-                    self.ctx, i_batch[most_likely_tokens_index])
+                    self.ctx, i_batch[most_likely_tokens_index]
+                )
 
                 n_vocabulary = llama_cpp.llama_n_vocab(self.model)
                 converted_logits = logits[:n_vocabulary]  # noqa
@@ -291,18 +300,19 @@ class Classifier:
                         "logit": max_logit,
                         "token": most_likely_token,
                         "token_str": self._decode_token(most_likely_token),
-                    }
+                    },
                 )
 
                 if (
-                    most_likely_token == llama_cpp.llama_token_eos(self.ctx) or
-                    n_cur >= self.n_new_tokens
+                    most_likely_token == llama_cpp.llama_token_eos(self.ctx)
+                    or n_cur >= self.n_new_tokens
                 ):
                     i_batch[most_likely_tokens_index] = -1
 
                 else:
                     self._add_token_to_batch(
-                        most_likely_token, n_cur, most_likely_tokens_index)
+                        most_likely_token, n_cur, most_likely_tokens_index
+                    )
                     # Update the index
                     i_batch[most_likely_tokens_index] = self.batch.n_tokens
 
@@ -317,12 +327,15 @@ class Classifier:
 
         return classes_tokens_and_logit
 
-    def classify(self, prompt: bytes, max_new_tokens: int = 512) -> dict[str, float]:
+    def classify(
+        self, prompt: bytes, max_new_tokens: int = 512
+    ) -> dict[str, float]:
         """Classify the prompt.
 
         Args:
             prompt (bytes): The prompt to classify.
-            max_new_tokens (int, optional): The maximum number of new tokens. Defaults to 512.
+            max_new_tokens (int, optional): The maximum number of new tokens.
+            Defaults to 512.
 
         Returns:
             dict[str, float]: The probabilities of the classes.
@@ -384,12 +397,11 @@ if __name__ == "__main__":
         "TheBloke/Llama-2-7B-chat-GGUF",
         "llama-2-7b-chat.Q5_K_M.gguf",
         cache_dir="./models",
-        revision="main"
+        revision="main",
     )
 
     my_classifier = Classifier(
-        llama_model_path,
-        ["positive", "negative", "neutral"]
+        llama_model_path, ["positive", "negative", "neutral"]
     )
 
     probabilities = my_classifier.classify(
@@ -400,8 +412,6 @@ if __name__ == "__main__":
     print("One shot classification")
     print(probabilities)
 
-    probabilities = my_classifier.classify(
-        b"'You are a loser!'\n"
-    )
+    probabilities = my_classifier.classify(b"'You are a loser!'\n")
     print("Zero shot classification")
     print(probabilities)

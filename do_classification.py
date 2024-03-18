@@ -41,17 +41,13 @@ def load_all_prompts(root_path: pathlib.Path):
         if not file.is_file():
             continue
 
-        with file.open(mode='r', encoding='utf-8') as file_processor:
+        with file.open(mode="r", encoding="utf-8") as file_processor:
             file_content = file_processor.read()
 
-        if file.suffix == '.json':
+        if file.suffix == ".json":
             ground_truth = file_content
 
-        prompts_dict.update(
-            {
-                str(file): file_content
-            }
-        )
+        prompts_dict.update({str(file): file_content})
 
     return prompts_dict, ground_truth
 
@@ -73,23 +69,23 @@ def main():
 
     prompts_by_model = {}
     for path, prompt in prompts.items():
-        model_friendly_name = path.replace('/', '\\').split('\\')[1]
+        model_friendly_name = path.replace("/", "\\").split("\\")[1]
 
         append_to_dict(prompts_by_model, model_friendly_name, {path: prompt})
 
     for _, model_config in models_configs.items():
-        model_friendly_name = model_config.get(
-            'model', {}).get('friendly_name')
+        model_friendly_name = model_config.get("model", {}).get(
+            "friendly_name"
+        )
 
-        model_repo_id = model_config.get(
-            'model', {}).get('hub')
+        model_repo_id = model_config.get("model", {}).get("hub")
 
         model_cache_dir = pathlib.Path(
-            model_config.get('model', {}).get('local_path')
+            model_config.get("model", {}).get("local_path")
         ).parent
 
         model_file = pathlib.Path(
-            model_config.get('model', {}).get('local_path')
+            model_config.get("model", {}).get("local_path")
         ).name
 
         # We should load the model path here
@@ -106,5 +102,5 @@ def main():
             # Put the prompt through the model
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

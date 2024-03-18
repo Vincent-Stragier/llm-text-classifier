@@ -1,4 +1,5 @@
 """This script locally download all the LLMS weights from huggingface"""
+
 import os
 
 import huggingface_hub
@@ -24,14 +25,16 @@ def download_all_llms(
 
     for _, model_config in models_configs.items():
         # Download the model
-        local_path = absolute_join(configs_path, model_config.get(
-            "model", {}).get("local_path"))
+        local_path = absolute_join(
+            configs_path, model_config.get("model", {}).get("local_path")
+        )
         local_path = os.path.dirname(local_path)
 
         huggingface_hub.hf_hub_download(
             repo_id=model_config.get("model", {}).get("hub"),
             filename=os.path.basename(
-                model_config.get("model", {}).get("file")),
+                model_config.get("model", {}).get("file")
+            ),
             cache_dir=local_path,
         )
 
@@ -42,5 +45,5 @@ def main():
     download_all_llms(models_configs, MODELS_CONFIGS_PATH)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
