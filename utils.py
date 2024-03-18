@@ -18,6 +18,20 @@ def softmax(logits):
     return e_x / e_x.sum(axis=0)
 
 
+def log_softmax(logits):
+    """Compute the log softmax of the logits.
+
+    Log softmax function for numerical stability.
+
+    Args:
+        logits (numpy.ndarray): The logits.
+
+    Returns:
+        numpy.ndarray: The log softmax of the logits.
+    """
+    return numpy.log(softmax(logits))
+
+
 def compute_cumulative_probabilities(classes_tokens_and_logits: dict):
     """Compute the cumulative probabilities of the classes.
 
@@ -45,6 +59,21 @@ def compute_cumulative_probabilities(classes_tokens_and_logits: dict):
         classes_probabilities[class_name] = _probabilities[index]
 
     return classes_probabilities
+    # normalized_log_probs = {}
+
+    # for class_name, tokens in classes_tokens_and_logits.items():
+    #     logits = [token_info['logit'] for token_info in tokens]
+    #     log_probs = log_softmax(logits)
+    #     # Sum log probabilities and normalize by the number of tokens
+    #     normalized_log_prob = numpy.sum(log_probs) / len(tokens)
+    #     normalized_log_probs[class_name] = normalized_log_prob
+
+    # # If you need them back in probability space
+    # normalized_probs = {k: numpy.exp(v)
+    #                     for k, v in normalized_log_probs.items()}
+
+    # print(normalized_log_probs)
+    # print(normalized_probs)
 
 
 def ensure_path_exists(path: os.PathLike):

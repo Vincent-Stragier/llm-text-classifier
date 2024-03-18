@@ -388,7 +388,7 @@ if __name__ == "__main__":
 
     my_classifier = Classifier(
         llama_model_path,
-        ["positive", "negative", "neutral", "another_class"]
+        ["positive", "negative", "neutral"]
     )
 
     probabilities = my_classifier.classify(
