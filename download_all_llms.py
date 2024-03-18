@@ -3,10 +3,8 @@ import os
 
 import huggingface_hub
 
+from constants import MODELS_CONFIGS_PATH
 from utils import load_all_configs
-
-# The path containing all the models to download
-MODELS_CONFIGS_PATH = "./models_configs"
 
 
 def download_all_llms(

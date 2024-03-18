@@ -1,4 +1,3 @@
-from huggingface_hub import hf_hub_download
 import ctypes
 import os
 
@@ -40,7 +39,7 @@ class Classifier:
             n_gpu_layers (int): The number of GPU layers.
             numa (bool): Whether to use NUMA.
         """
-        llama_cpp.llama_backend_init(numa=numa)
+        llama_cpp.llama_backend_init(numa=numa)  # noqa
 
         # Initialize the model with the default parameters
         params = llama_cpp.llama_model_default_params()
@@ -251,7 +250,7 @@ class Classifier:
                     classes_tokens_and_logit,
                     current_class,
                     {
-                        "logit": logits[current_class_token],
+                        "logit": logits[current_class_token],  # noqa
                         "token": current_class_token,
                         "token_str": self._decode_token(current_class_token),
                     }
@@ -279,7 +278,7 @@ class Classifier:
                     self.ctx, i_batch[most_likely_tokens_index])
 
                 n_vocabulary = llama_cpp.llama_n_vocab(self.model)
-                converted_logits = logits[:n_vocabulary]
+                converted_logits = logits[:n_vocabulary]  # noqa
                 converted_logits = numpy.array(converted_logits)
 
                 max_logit = converted_logits.max()
@@ -339,7 +338,7 @@ class Classifier:
         self.free_batch()
         self.free_context()
 
-        return compute_cumulative_probabilities(classes_logits)
+        return compute_cumulative_probabilities(classes_logits), classes_logits
 
     def free_batch(self):
         """Free the batch."""
@@ -378,6 +377,8 @@ class Classifier:
 
 
 if __name__ == "__main__":
+    from huggingface_hub import hf_hub_download
+
     # Load the model from the Hugging Face Hub
     llama_model_path = hf_hub_download(
         "TheBloke/Llama-2-7B-chat-GGUF",

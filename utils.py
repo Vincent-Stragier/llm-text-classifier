@@ -1,8 +1,14 @@
 """The utility functions of the project."""
 import os
-import yaml
+import pathlib
 
 import numpy
+import yaml
+
+from constants import (
+    DEFAULT_PROMPTS_PATH,
+    DEFAULT_RESULTS_PATH,
+)
 
 
 def softmax(logits):
@@ -74,6 +80,33 @@ def compute_cumulative_probabilities(classes_tokens_and_logits: dict):
 
     # print(normalized_log_probs)
     # print(normalized_probs)
+
+
+def make_result_path(
+    prompt_path: pathlib.Path | str,
+    prompt_root: pathlib.Path | str = DEFAULT_PROMPTS_PATH,
+    result_root: pathlib.Path | str = DEFAULT_RESULTS_PATH
+) -> pathlib.Path:
+    """Create the result path from the prompt path.
+
+    Args:
+        prompt_path (pathlib.Path | str): The path to the prompt file.
+        prompt_root (pathlib.Path | str, optional):
+        The root of the prompt files. Defaults to DEFAULT_PROMPTS_PATH.
+        result_root (pathlib.Path | str, optional):
+        The root of the result files. Defaults to DEFAULT_RESULTS_PATH.
+
+    Returns:
+        pathlib.Path: The path to the result file.
+    """
+    prompt_path = pathlib.Path(prompt_path)
+    prompt_root = pathlib.Path(prompt_root)
+    result_root = pathlib.Path(result_root)
+
+    result_path = prompt_path.relative_to(prompt_root).with_suffix('.json')
+    result_path = result_root / result_path
+
+    return result_path
 
 
 def ensure_path_exists(path: os.PathLike):

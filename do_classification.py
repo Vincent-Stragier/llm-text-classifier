@@ -5,17 +5,31 @@
 # Compare to the ground truth
 # Calculate the accuracy
 # Save the results
+import json
 import pathlib
 
-from utils import load_all_configs
-#
+from huggingface_hub import hf_hub_download
 
-DEFAULT_MODELS_CONFIGS_PATH = './models_configs'
-DEFAULT_PROMPTS_PATH = './prompts'
+
+from classifiers import Classifier
+from constants import (
+    DEFAULT_MODELS_CONFIGS_PATH,
+    DEFAULT_PROMPTS_PATH,
+)
+from utils import load_all_configs
 
 
 # Create a function to load all the prompts
 def load_all_prompts(root_path: pathlib.Path):
+    """Load all the prompts from a specified directory.
+
+    Args:
+        root_path (pathlib.Path): the path to the prompts directory.
+
+    Returns:
+        dict: a dictionary with all the prompts.
+        The key of the prompts is its filename.
+    """
     prompts_dict = {}
 
     # We could ignore some files
@@ -52,6 +66,11 @@ def main():
         else:
             dictionary[key].append(value)
 
+    # We need to know which prompts have not been analysed yet
+    # (to do so, we also need to list all the results)
+    # Then we can remove the processed prompts to reduce
+    # the execution time and allow to restart the process.
+
     prompts_by_model = {}
     for path, prompt in prompts.items():
         model_friendly_name = path.replace('/', '\\').split('\\')[1]
@@ -62,7 +81,24 @@ def main():
         model_friendly_name = model_config.get(
             'model', {}).get('friendly_name')
 
+        model_repo_id = model_config.get(
+            'model', {}).get('hub')
+
+        model_cache_dir = pathlib.Path(
+            model_config.get('model', {}).get('local_path')
+        ).parent
+
+        model_file = pathlib.Path(
+            model_config.get('model', {}).get('local_path')
+        ).name
+
         # We should load the model path here
+        # llm_model_path = hf_hub_download(
+        #     model_repo_id,
+        #     model_file,
+        #     cache_dir=model_cache_dir,
+        #     revision="main"
+        # )
 
         for path_and_prompt in prompts_by_model.get(model_friendly_name, []):
             prompt_path, prompt = list(path_and_prompt.items())[0]
