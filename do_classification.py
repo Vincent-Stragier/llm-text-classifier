@@ -152,6 +152,9 @@ def main():
 
             # Save the result
             result_path = make_result_path(prompt_path)
+            # Ensure the directory exists
+            result_path.parent.mkdir(parents=True, exist_ok=True)
+
             with result_path.open(mode="w", encoding="utf-8") as file_processor:
                 json.dump(result_classes_and_truth, file_processor, indent=4)
 
