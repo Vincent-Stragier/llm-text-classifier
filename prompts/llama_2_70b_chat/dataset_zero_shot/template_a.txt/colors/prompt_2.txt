@@ -1,4 +1,4 @@
-[INST]<<SYS>>Your task is to classify the user intent in one of the following classes:
+[INST]<<SYS>>Your task is to classify the user intent in one of the following classes, only respond in lowercase, beginning with the class name:
 -add_face
 -age_estimation
 -colors
@@ -18,4 +18,4 @@
 -position
 -remove_face
 
-And to extract the proper entities from the user query, when needed.<</SYS>>What is the total amount of money in my coin collection?[/INST]
+You should also extract the proper entities from the user query, when needed.<</SYS>>What is the dominant color of my shirt?[/INST]

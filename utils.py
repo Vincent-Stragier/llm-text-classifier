@@ -1,4 +1,5 @@
 """The utility functions of the project."""
+
 import json
 import os
 import pathlib
@@ -183,6 +184,6 @@ def get_classes_from_github(url: str = GITHUB_TOOL_URL) -> list:
 
     classes = set()
     for tool in response.json():
-        classes.add(tool['tool_name'])
+        classes.add(tool["tool_name"])
 
     return sorted(list(classes))

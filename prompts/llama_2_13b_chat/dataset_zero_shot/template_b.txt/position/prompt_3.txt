@@ -1,4 +1,4 @@
-[INST]<<SYS>>Your task is to classify the user intent in one of the following classes:
+[INST]<<SYS>>Your task is to classify the user intent in one of the following classes, only respond in lowercase, beginning with the class name:
 -add_face
 -age_estimation
 -colors
@@ -18,10 +18,10 @@
 -position
 -remove_face
 
-And to extract the proper entities from the user query, when needed.
+You should also extract the proper entities from the user query, when needed.
 
 Here are some examples of user queries, their intent and entities:
 ```
-Describe the doors in the room.[/INST]
-environment_description(doors)
-```<</SYS>>Tell me about the windows in the room.[/INST]
+Tell me my location.[/INST]
+position()
+```<</SYS>>Give me my location.[/INST]

@@ -1,4 +1,4 @@
-Your task is to classify the user intent in one of the following classes:
+Your task is to classify the user intent in one of the following classes, only respond in lowercase, beginning with the class name:
 {{ classes_list }}
 
-And to extract the proper entities from the user query, when needed.
+You should also extract the proper entities from the user query, when needed.

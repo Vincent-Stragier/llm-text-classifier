@@ -58,9 +58,7 @@ class Classifier:
         if isinstance(model_path, str):
             model_path = model_path.encode("utf-8")
 
-        self.model = llama_cpp.llama_load_model_from_file(
-            model_path, params
-        )
+        self.model = llama_cpp.llama_load_model_from_file(model_path, params)
 
         self.n_new_tokens = n_new_tokens
 
@@ -331,7 +329,10 @@ class Classifier:
         return classes_tokens_and_logit
 
     def classify(
-        self, prompt: bytes | str, classes: Iterable = None, max_new_tokens: int = 512
+        self,
+        prompt: bytes | str,
+        classes: Iterable = None,
+        max_new_tokens: int = 512,
     ) -> dict[str, float]:
         """Classify the prompt.
 
@@ -428,6 +429,7 @@ if __name__ == "__main__":
     print(probabilities)
 
     probabilities = my_classifier.classify(
-        b"[INST]'You are a loser!'[\\INST]\n")
+        b"[INST]'You are a loser!'[\\INST]\n"
+    )
     print("Zero shot classification")
     print(probabilities)

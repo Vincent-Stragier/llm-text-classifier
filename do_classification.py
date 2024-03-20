@@ -62,9 +62,7 @@ def get_classes_by_dataset():
 
     def get_classes_from_dataset(dataset):
         """Get the classes from a dataset."""
-        return sorted(
-            list({tool.get("tool_name", None) for tool in dataset})
-        )
+        return sorted(list({tool.get("tool_name", None) for tool in dataset}))
 
     return {
         "dataset_zero_shot": get_classes_from_dataset(dataset_a),
@@ -97,8 +95,11 @@ def main():
 
         if not result_path.exists():
             truth = ground_truth.get(path, None)
-            append_to_dict(prompts_by_model,
-                           model_friendly_name, {path: (prompt, result_path, truth)})
+            append_to_dict(
+                prompts_by_model,
+                model_friendly_name,
+                {path: (prompt, result_path, truth)},
+            )
 
     for _, model_config in tqdm(models_configs.items()):
         model_friendly_name = model_config.get("model", {}).get(
@@ -120,7 +121,7 @@ def main():
             model_repo_id,
             model_file,
             cache_dir=model_cache_dir,
-            revision="main"
+            revision="main",
         )
 
         classifier = Classifier(
@@ -130,9 +131,12 @@ def main():
             n_gpu_layers=-1,
         )
 
-        for path_and_prompt in tqdm(prompts_by_model.get(model_friendly_name, [])):
+        for path_and_prompt in tqdm(
+            prompts_by_model.get(model_friendly_name, [])
+        ):
             prompt_path, prompt_and_result_path = list(
-                path_and_prompt.items())[0]
+                path_and_prompt.items()
+            )[0]
             prompt = prompt_and_result_path[0]
             result_path = prompt_and_result_path[1]
             truth = prompt_and_result_path[2]
@@ -140,8 +144,7 @@ def main():
             dataset_name = prompt_path.split("\\")[2]
 
             result = classifier.classify(
-                prompt,
-                classes_by_dataset.get(dataset_name)
+                prompt, classes_by_dataset.get(dataset_name)
             )
 
             result_classes_and_truth = {
@@ -155,7 +158,9 @@ def main():
             # Ensure the directory exists
             result_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with result_path.open(mode="w", encoding="utf-8") as file_processor:
+            with result_path.open(
+                mode="w", encoding="utf-8"
+            ) as file_processor:
                 json.dump(result_classes_and_truth, file_processor, indent=4)
 
         del classifier

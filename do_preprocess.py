@@ -13,11 +13,7 @@ from typing import Iterable
 import numpy as np
 import jinja2
 
-from constants import (
-    DEFAULT_PROMPTS_PATH,
-    PATH_DATASET_A,
-    PATH_DATASET_B
-)
+from constants import DEFAULT_PROMPTS_PATH, PATH_DATASET_A, PATH_DATASET_B
 from utils import load_all_configs, load_dataset
 
 
@@ -186,7 +182,8 @@ def make_prompts(
             classes_list = "\n-"
             classes_list = f"-{classes_list.join(tools)}"
 
-            for tool, tool_name in zip(dataset, tools):
+            for tool in dataset:
+                tool_name = tool.get("tool_name", None)
                 test_set = tool.get("dataset", {}).get("test", None)
                 train_set = deepcopy(
                     tool.get("dataset", {}).get("train", None)
@@ -249,6 +246,7 @@ def make_prompts(
                         expected_class[str(element_prompt_path)] = element.get(
                             "command", None
                         )
+
                         with element_prompt_path.open(
                             mode="w", encoding="utf-8"
                         ) as prompt_file:

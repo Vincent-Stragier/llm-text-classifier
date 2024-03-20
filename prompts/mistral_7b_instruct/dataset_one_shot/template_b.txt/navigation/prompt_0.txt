@@ -1,4 +1,4 @@
-<s>[INST]Your task is to classify the user intent in one of the following classes:
+<s>[INST]Your task is to classify the user intent in one of the following classes, only respond in lowercase, beginning with the class name:
 -add_face
 -age_estimation
 -colors
@@ -18,10 +18,10 @@
 -position
 -remove_face
 
-And to extract the proper entities from the user query, when needed.
+You should also extract the proper entities from the user query, when needed.
 
 Here are some examples of user queries, their intent and entities:
 ```
-Is Andrew a man or a woman?[/INST]
-gender_estimation('Andrew')
-```What gender is Matthew?[/INST]
+Take me to the nearest art gallery.[/INST]
+navigation('nearest art gallery')
+```Guide me to the closest post office.[/INST]
