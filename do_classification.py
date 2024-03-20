@@ -141,7 +141,7 @@ def main():
             result_path = prompt_and_result_path[1]
             truth = prompt_and_result_path[2]
 
-            dataset_name = prompt_path.split("\\")[2]
+            dataset_name = prompt_path.replace("/", "\\").split("\\")[2]
 
             result = classifier.classify(
                 prompt, classes_by_dataset.get(dataset_name)
