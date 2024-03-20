@@ -13,20 +13,12 @@ from typing import Iterable
 import numpy as np
 import jinja2
 
-from utils import load_all_configs
-
-
-def load_dataset(path) -> list:
-    """Load a dataset.
-
-    Args:
-        path (str | Path): the path for the dataset1
-
-    Returns:
-        list: the list of the dataset elements
-    """
-    with open(path, mode="rb") as json_file:
-        return json.load(json_file)
+from constants import (
+    DEFAULT_PROMPTS_PATH,
+    PATH_DATASET_A,
+    PATH_DATASET_B
+)
+from utils import load_all_configs, load_dataset
 
 
 def split_dataset(
@@ -168,7 +160,7 @@ def make_prompts(
     prompts_templates,
     models_dict,
     datasets,
-    root="./prompts",
+    root=DEFAULT_PROMPTS_PATH,
     random_seed: int = 5876,
 ):
     # Models
@@ -274,10 +266,10 @@ def make_prompts(
 
 def main():
     """The main function of the script."""
-    # Dataset generated via Belunga using a zero-shot approach
-    dataset_a = load_dataset("datasets/dataset_a.json")
-    # Dataset generated via Belunga using a one-shot approach
-    dataset_b = load_dataset("datasets/dataset_b.json")
+    # Dataset generated via StableBeluga2 using a zero-shot approach
+    dataset_a = load_dataset(PATH_DATASET_A)
+    # Dataset generated via StableBeluga2 using a one-shot approach
+    dataset_b = load_dataset(PATH_DATASET_B)
 
     datasets = {
         "dataset_zero_shot": split_dataset(dataset_a),

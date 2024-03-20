@@ -328,18 +328,26 @@ class Classifier:
         return classes_tokens_and_logit
 
     def classify(
-        self, prompt: bytes, max_new_tokens: int = 512
+        self, prompt: bytes | str, classes: Iterable = None, max_new_tokens: int = 512
     ) -> dict[str, float]:
         """Classify the prompt.
 
         Args:
             prompt (bytes): The prompt to classify.
+            classes (Iterable, optional): The classes to classify.
             max_new_tokens (int, optional): The maximum number of new tokens.
             Defaults to 512.
 
         Returns:
             dict[str, float]: The probabilities of the classes.
+
         """
+        if isinstance(prompt, str):
+            # The encoding is a bit tricky, let's assume utf-8.
+            prompt = prompt.encode("utf-8")
+
+        if classes is not None:
+            self.classes = classes
         self._tokenize_initial_prompt(prompt, max_new_tokens)
         self._init_context()
         self._init_batch()
@@ -401,17 +409,20 @@ if __name__ == "__main__":
     )
 
     my_classifier = Classifier(
-        llama_model_path, ["positive", "negative", "neutral"]
+        llama_model_path, ["positive", "negative", "neutral", "another_class"]
     )
 
     probabilities = my_classifier.classify(
-        b"You should classify the following sentence as "
-        b"'positive', 'negative', 'neutral' or 'another_class':\n"
-        b"'You are a loser!'\n"
+        b"[INST]You must classify the following sentence as "
+        b"'positive', 'negative', 'neutral' or 'another_class',"
+        b"only respond in lowercase with one of the previously"
+        b" mentioned class name:\n"
+        b"'You are a loser!'[\\INST]\n"
     )
     print("One shot classification")
     print(probabilities)
 
-    probabilities = my_classifier.classify(b"'You are a loser!'\n")
+    probabilities = my_classifier.classify(
+        b"[INST]'You are a loser!'[\\INST]\n")
     print("Zero shot classification")
     print(probabilities)

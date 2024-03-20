@@ -1,5 +1,4 @@
 """This script locally download all the LLMS weights from huggingface"""
-
 import os
 
 import huggingface_hub

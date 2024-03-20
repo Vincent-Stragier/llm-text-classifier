@@ -1,14 +1,16 @@
 """The utility functions of the project."""
-
+import json
 import os
 import pathlib
 
 import numpy
+import requests
 import yaml
 
 from constants import (
     DEFAULT_PROMPTS_PATH,
     DEFAULT_RESULTS_PATH,
+    GITHUB_TOOL_URL,
 )
 
 
@@ -116,6 +118,19 @@ def ensure_path_exists(path: os.PathLike):
         os.makedirs(path, exist_ok=True)
 
 
+def load_dataset(path) -> list:
+    """Load a dataset.
+
+    Args:
+        path (str | Path): the path for the dataset1
+
+    Returns:
+        list: the list of the dataset elements
+    """
+    with open(path, mode="rb") as json_file:
+        return json.load(json_file)
+
+
 def load_all_configs(
     models_configs_path: os.PathLike,
 ) -> dict:
@@ -151,3 +166,23 @@ def load_all_configs(
             )
 
     return models_configs_dict
+
+
+def get_classes_from_github(url: str = GITHUB_TOOL_URL) -> list:
+    """Get the classes from the github repository.
+
+    Args:
+        url (str, optional): The url to the github repository.
+        Defaults to GITHUB_TOOL_URL.
+
+    Returns:
+        list: The classes of the github repository.
+    """
+    response = requests.get(url, timeout=5)
+    response.raise_for_status()
+
+    classes = set()
+    for tool in response.json():
+        classes.add(tool['tool_name'])
+
+    return sorted(list(classes))
