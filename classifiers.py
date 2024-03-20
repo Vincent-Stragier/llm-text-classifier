@@ -49,14 +49,17 @@ class Classifier:
         self.n_parallel = len(classes) + 1
 
         params.n_ctx = n_ctx
-        params.n_parallel = self.n_parallel
+        # params.n_parallel = self.n_parallel
         params.n_batch = max(n_ctx, self.n_parallel)
         params.n_threads = n_threads
         params.n_threads_batch = n_threads_batch
         params.n_gpu_layers = n_gpu_layers
 
+        if isinstance(model_path, str):
+            model_path = model_path.encode("utf-8")
+
         self.model = llama_cpp.llama_load_model_from_file(
-            model_path.encode("utf-8"), params
+            model_path, params
         )
 
         self.n_new_tokens = n_new_tokens
@@ -348,6 +351,8 @@ class Classifier:
 
         if classes is not None:
             self.classes = classes
+            self.n_parallel = len(classes) + 1
+
         self._tokenize_initial_prompt(prompt, max_new_tokens)
         self._init_context()
         self._init_batch()
