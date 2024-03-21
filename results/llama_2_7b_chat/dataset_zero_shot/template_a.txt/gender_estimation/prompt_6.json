@@ -1,0 +1,353 @@
+{
+    "result": [
+        {
+            "add_face": 1.9917547292091728e-13,
+            "age_estimation": 3.0027604231338906e-18,
+            "colors": 6.859551047575094e-26,
+            "detect_object": 1.3150218329528996e-19,
+            "emotion_estimation": 8.215703936044394e-24,
+            "enumerate_individuals": 0.9999996203550072,
+            "enumerate_objects": 2.434138940895654e-12,
+            "environment_description": 3.364476320975349e-07,
+            "environment_question": 4.2870160177439245e-08,
+            "gender_estimation": 3.2387902555062267e-10,
+            "look_for_face": 6.880839464922652e-13,
+            "money": 3.13132852786857e-24,
+            "navigation": 2.6194947183047914e-26,
+            "object_color": 8.118531739913531e-19,
+            "ocr": 2.302332305563015e-17,
+            "ocr_objects": 1.8022942695892473e-21,
+            "position": 3.2137667955774203e-25,
+            "remove_face": 1.6496481085599201e-24
+        },
+        {
+            "add_face": [
+                {
+                    "logit": -1.3610124588012695,
+                    "token": 788,
+                    "token_str": " add"
+                },
+                {
+                    "logit": 21.544185638427734,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 6.209735870361328,
+                    "token": 2161,
+                    "token_str": "face"
+                }
+            ],
+            "age_estimation": [
+                {
+                    "logit": -2.325822591781616,
+                    "token": 5046,
+                    "token_str": " age"
+                },
+                {
+                    "logit": 8.483955383300781,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 9.888716697692871,
+                    "token": 342,
+                    "token_str": "est"
+                },
+                {
+                    "logit": -0.7563499212265015,
+                    "token": 7715,
+                    "token_str": "imation"
+                }
+            ],
+            "colors": [
+                {
+                    "logit": -2.3040711879730225,
+                    "token": 11955,
+                    "token_str": " colors"
+                }
+            ],
+            "detect_object": [
+                {
+                    "logit": -0.7482662200927734,
+                    "token": 6459,
+                    "token_str": " detect"
+                },
+                {
+                    "logit": 8.929854393005371,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 3.980647563934326,
+                    "token": 3318,
+                    "token_str": "object"
+                }
+            ],
+            "emotion_estimation": [
+                {
+                    "logit": -2.4868597984313965,
+                    "token": 953,
+                    "token_str": " em"
+                },
+                {
+                    "logit": 2.3928751945495605,
+                    "token": 8194,
+                    "token_str": "otion"
+                },
+                {
+                    "logit": 1.9747782945632935,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 2.2261486053466797,
+                    "token": 342,
+                    "token_str": "est"
+                },
+                {
+                    "logit": -1.62543785572052,
+                    "token": 7715,
+                    "token_str": "imation"
+                }
+            ],
+            "enumerate_individuals": [
+                {
+                    "logit": -2.9382927417755127,
+                    "token": 26985,
+                    "token_str": " enumerate"
+                },
+                {
+                    "logit": 27.845287322998047,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 27.977710723876953,
+                    "token": 513,
+                    "token_str": "ind"
+                },
+                {
+                    "logit": -0.2813851833343506,
+                    "token": 23352,
+                    "token_str": "ividual"
+                },
+                {
+                    "logit": 3.0341787338256836,
+                    "token": 29879,
+                    "token_str": "s"
+                }
+            ],
+            "enumerate_objects": [
+                {
+                    "logit": -2.9382927417755127,
+                    "token": 26985,
+                    "token_str": " enumerate"
+                },
+                {
+                    "logit": 24.463897705078125,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 7.370466232299805,
+                    "token": 12650,
+                    "token_str": "objects"
+                }
+            ],
+            "environment_description": [
+                {
+                    "logit": -0.8655105829238892,
+                    "token": 5177,
+                    "token_str": " environment"
+                },
+                {
+                    "logit": 24.677913665771484,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 16.920272827148438,
+                    "token": 8216,
+                    "token_str": "description"
+                }
+            ],
+            "environment_question": [
+                {
+                    "logit": -0.8655105829238892,
+                    "token": 5177,
+                    "token_str": " environment"
+                },
+                {
+                    "logit": 26.145416259765625,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 13.39250373840332,
+                    "token": 12470,
+                    "token_str": "question"
+                }
+            ],
+            "gender_estimation": [
+                {
+                    "logit": -0.9393281936645508,
+                    "token": 23346,
+                    "token_str": " gender"
+                },
+                {
+                    "logit": 26.9824161529541,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 9.045167922973633,
+                    "token": 342,
+                    "token_str": "est"
+                },
+                {
+                    "logit": -1.3014076948165894,
+                    "token": 7715,
+                    "token_str": "imation"
+                }
+            ],
+            "look_for_face": [
+                {
+                    "logit": 0.041623830795288086,
+                    "token": 1106,
+                    "token_str": " look"
+                },
+                {
+                    "logit": 7.874817371368408,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 8.121440887451172,
+                    "token": 1454,
+                    "token_str": "for"
+                },
+                {
+                    "logit": 9.539619445800781,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 2.0551321506500244,
+                    "token": 2161,
+                    "token_str": "face"
+                }
+            ],
+            "money": [
+                {
+                    "logit": 1.5169143676757812,
+                    "token": 6909,
+                    "token_str": " money"
+                }
+            ],
+            "navigation": [
+                {
+                    "logit": -3.2667317390441895,
+                    "token": 11322,
+                    "token_str": " navigation"
+                }
+            ],
+            "object_color": [
+                {
+                    "logit": -0.16085898876190186,
+                    "token": 1203,
+                    "token_str": " object"
+                },
+                {
+                    "logit": 13.325604438781738,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 0.8177863359451294,
+                    "token": 2780,
+                    "token_str": "color"
+                }
+            ],
+            "ocr": [
+                {
+                    "logit": 0.08445239067077637,
+                    "token": 288,
+                    "token_str": " o"
+                },
+                {
+                    "logit": 17.243022918701172,
+                    "token": 7283,
+                    "token_str": "cr"
+                }
+            ],
+            "ocr_objects": [
+                {
+                    "logit": 0.08445239067077637,
+                    "token": 288,
+                    "token_str": " o"
+                },
+                {
+                    "logit": -2.568009376525879,
+                    "token": 7283,
+                    "token_str": "cr"
+                },
+                {
+                    "logit": 6.782763481140137,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 3.573066234588623,
+                    "token": 12650,
+                    "token_str": "objects"
+                }
+            ],
+            "position": [
+                {
+                    "logit": -0.7596843838691711,
+                    "token": 2602,
+                    "token_str": " position"
+                }
+            ],
+            "remove_face": [
+                {
+                    "logit": -1.6444878578186035,
+                    "token": 3349,
+                    "token_str": " remove"
+                },
+                {
+                    "logit": 0.0,
+                    "token": 29918,
+                    "token_str": "_"
+                },
+                {
+                    "logit": 2.5205068588256836,
+                    "token": 2161,
+                    "token_str": "face"
+                }
+            ]
+        }
+    ],
+    "truth": "gender_estimation(person_name='John Doe')",
+    "classes": [
+        "add_face",
+        "age_estimation",
+        "colors",
+        "detect_object",
+        "emotion_estimation",
+        "enumerate_individuals",
+        "enumerate_objects",
+        "environment_description",
+        "environment_question",
+        "gender_estimation",
+        "look_for_face",
+        "money",
+        "navigation",
+        "object_color",
+        "ocr",
+        "ocr_objects",
+        "position",
+        "remove_face"
+    ]
+}

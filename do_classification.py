@@ -1,4 +1,5 @@
 import json
+import os
 import pathlib
 
 from tqdm import tqdm
@@ -124,11 +125,14 @@ def main():
             revision="main",
         )
 
+        # print(f'{os.cpu_count()}')
         classifier = Classifier(
             llm_model_path,
             # We will define the classes later
             classes=[],
-            n_gpu_layers=-1,
+            n_gpu_layers=0,
+            n_threads=80,
+            n_threads_batch=80,
         )
 
         for path_and_prompt in tqdm(
